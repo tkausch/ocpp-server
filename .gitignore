@@ -6,3 +6,6 @@ __pycache__/
 go/csms
 *.test
 go/go
+kotlin/build/
+kotlin/.gradle/
+kotlin/.kotlin/
