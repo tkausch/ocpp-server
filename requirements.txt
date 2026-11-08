@@ -1,0 +1,4 @@
+ocpp==2.1.0
+websockets>=15
+pytest
+pytest-asyncio
