@@ -73,7 +73,7 @@ cd kotlin
 
 A runnable distribution is also available: `./gradlew installDist`, then `build/install/ocpp-csms/bin/ocpp-csms [port]`.
 
-Clients that do not offer the `ocpp2.1` subprotocol get a `404`. The Kotlin server does not validate payloads against the OCPP JSON schemas; the Python and Go servers do.
+Clients that do not offer the `ocpp2.1` subprotocol get a `404`. The Kotlin server does not validate payloads against the OCPP JSON schemas; the Python and Go servers do. Malformed payloads are answered with a `FormatViolation` error.
 
 ## What the simulation does
 
