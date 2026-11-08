@@ -35,6 +35,19 @@ python charge_point.py ws://localhost:9000/CP_2 # custom URL / station ID
 
 If you see `address already in use`, another process holds port 9000. Find it with `lsof -nP -iTCP:9000 -sTCP:LISTEN` and stop it with `kill <PID>`.
 
+## Go server
+
+`go/` contains a Go port of the server (`csms.py`), built on [`otfabric/go-ocpp`](https://github.com/otfabric/go-ocpp). It behaves the same way, so the Python `charge_point.py` works against either server.
+
+```sh
+brew install go          # Go 1.26+
+cd go
+go run .                 # listens on :9000; use -addr :9001 to change
+go test -race ./...
+```
+
+Stop the Python server first, because both use port 9000. The Go server logs each message and the server-initiated RequestStopTransaction.
+
 ## What the simulation does
 
 1. The station connects with the `ocpp2.1` subprotocol and sends **BootNotification**; the server accepts it and sets a 10 s heartbeat interval.
@@ -47,6 +60,7 @@ If you see `address already in use`, another process holds port 9000. Find it wi
 | File | Purpose |
 |------|---------|
 | `csms.py` | Server. One `ChargePoint` handler object per connection, with `@on(Action.…)` handlers for Boot, Heartbeat, Status, Authorize, MeterValues and TransactionEvent. Also has `remote_start()` to send RequestStartTransaction. |
+| `go/main.go`, `go/main_test.go` | Go version of the server, with a test that uses the library's own station client. |
 | `charge_point.py` | Station simulator. Boots, sends heartbeats, runs a session, and handles RequestStartTransaction, RequestStopTransaction and Reset from the server. |
 | `tests/test_flow.py` | Starts the server in-process, runs a station, and asserts the event sequence `Started`, `Updated`, `Ended`. |
 | `requirements.txt` | Dependencies. |
