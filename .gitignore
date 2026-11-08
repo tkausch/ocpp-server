@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 go/csms
 *.test
+go/go
