@@ -39,6 +39,8 @@ Start the charging station in a second terminal. It works against whichever serv
 ```sh
 python charge_point.py                          # connects to ws://localhost:9000/CP_1
 python charge_point.py ws://localhost:9001/CP_2 # custom URL / station ID, e.g. a server on another port
+python charge_point.py --updates 3             # end the local session after 3 meter reports
+python charge_point.py --remote-only           # no local session; wait for RequestStartTransaction from the server
 ```
 
 If you see `address already in use`, another process holds the port, often a server you started earlier. Find it with `lsof -nP -iTCP:9000 -sTCP:LISTEN` and stop it with `kill <PID>`, or start the server on another port (the Go and Kotlin servers take a port option, see below).
@@ -89,7 +91,7 @@ Clients that do not offer the `ocpp2.1` subprotocol get a `404`. The Kotlin serv
 | `csms.py` | Server. One `ChargePoint` handler object per connection, with `@on(Action.…)` handlers for Boot, Heartbeat, Status, Authorize, MeterValues and TransactionEvent. Also has `remote_start()` to send RequestStartTransaction. |
 | `go/main.go`, `go/main_test.go` | Go version of the server, with a test that uses the library's own station client. |
 | `kotlin/` | Kotlin version of the server (Ktor). `OcppFrame.kt` (CALL / CALLRESULT / CALLERROR framing), `Messages.kt` (payload classes), `Csms.kt` (handlers, sessions), `Main.kt`; tests in `src/test/`. |
-| `charge_point.py` | Station simulator. Boots, sends heartbeats, runs a session, and handles RequestStartTransaction, RequestStopTransaction and Reset from the server. |
+| `charge_point.py` | Station simulator. Boots, sends heartbeats, runs a session, and handles RequestStartTransaction, RequestStopTransaction and Reset from the server. Structure: `StationConfig` (fixed parameters), `Transaction` (per-session state), `ChargePoint` (CSMS handlers plus `boot`, `session`, `close`), `run()` and a CLI (`main`). See the module docstring. |
 | `tests/test_flow.py` | Starts the server in-process, runs a station, and asserts the event sequence `Started`, `Updated`, `Ended`. |
 | `requirements.txt` | Dependencies. |
 | `pytest.ini` | Enables `pytest-asyncio` auto mode. |
